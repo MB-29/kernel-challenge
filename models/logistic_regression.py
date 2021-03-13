@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.linalg import solve
-
+from scipy.optimize import newton
 
 class LogisticRegression:
 
@@ -16,7 +16,7 @@ class LogisticRegression:
         self.weight = np.random.randn(self.d+1)
         self.tradeoff = tradeoff
 
-    def train(self, n_steps=100):
+    def _train(self, n_steps=100):
         
         # Newton-Raphson for L2-regularized likelihood maximization
         for step in range(n_steps):
@@ -33,6 +33,10 @@ class LogisticRegression:
 
             likelihood = self.compute_likelihood()
             print(likelihood)
+    
+    def train(self):
+        self.weight = newton(self.compute_gradient, self.weight)
+
 
     def classify(self, sample):
         log_ratio = self.weight[1:] @ sample + self.weight[0]
@@ -41,10 +45,28 @@ class LogisticRegression:
     def predict(self, test_data):
         return np.array([self.classify(sample) for sample in test_data])
 
-    def compute_likelihood(self):
-        overlap = self.extended_train_data @ self.weight
-        regularisation = - self.n * self.tradeoff * self.weight @ self.weight
+    def compute_likelihood(self, weight):
+        overlap = self.extended_train_data @ weight
+        regularisation = - self.n * self.tradeoff * weight @ weight
         return np.sum(self.train_labels * overlap - np.log(1 + np.exp(overlap))) + regularisation
-        
+    
+    def compute_gradient(self, weight):
+        activation = sigmoid(self.extended_train_data @ weight)
+        first_derivative = (
+            self.train_labels - activation).reshape((self.n, -1)) * self.extended_train_data
+        gradient = np.sum(first_derivative, axis=0) - 2 * \
+            self.n * self.tradeoff * weight
+        return gradient
+    
+    def compute_hessian(self, weight):
+        activation = sigmoid(self.extended_train_data @ weight)
+        hessian = np.zeros((self.d+1, self.d+1))
+        for i in range(self.n):
+            hessian -= activation[i] * (1 - activation[i]) * \
+                self.extended_train_data[i].T @ self.extended_train_data[i]
+        hessian -= 2 * self.n * self.tradeoff * np.eye(self.d+1)
+        return hessian
+
+    
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))

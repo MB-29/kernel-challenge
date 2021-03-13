@@ -22,7 +22,7 @@ regularization_tradeoff = 100
 n_steps = 20
 
 classifier = LogisticRegression(train_data, train_labels, regularization_tradeoff)
-classifier.train(n_steps)
+classifier.train()
 predictions = classifier.predict(test_data)
 accuracy = np.mean(test_labels == predictions)
 print(f'Accuracy = {accuracy}')
