@@ -3,7 +3,6 @@ from sklearn.metrics import classification_report
 from sklearn.svm import SVC
 import pandas as pd
 
-from utils import plot_sequence_colours
 from substring_kernel import fill_kernel_table
 
 TRAIN_DATA_PATH = 'data/Xtr0.csv'
