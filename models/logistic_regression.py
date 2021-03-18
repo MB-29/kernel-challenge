@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.linalg import solve
-from scipy.optimize import newton
+from scipy.optimize import minimize
 
 class LogisticRegression:
 
@@ -16,13 +16,14 @@ class LogisticRegression:
         self.weight = np.random.randn(self.d+1)
         self.tradeoff = tradeoff
 
-    def _train(self, n_steps=100):
+    def _train(self, n_steps=20):
         
         # Newton-Raphson for L2-regularized likelihood maximization
         for step in range(n_steps):
             activation = sigmoid(self.extended_train_data @ self.weight)
-            first_derivative = (self.train_labels - activation).reshape((self.n, -1)) * self.extended_train_data
-            gradient =  np.sum(first_derivative, axis=0) - 2 * self.n * self.tradeoff * self.weight
+            # first_derivative = (self.train_labels - activation).reshape((self.n, -1)) * self.extended_train_data
+            # gradient =  np.sum(first_derivative, axis=0) - 2 * self.n * self.tradeoff * self.weight
+            gradient = self.extended_train_data.T @ (self.train_labels - activation) - 2 * self.n * self.tradeoff * self.weight
 
             hessian = np.zeros((self.d+1, self.d+1))
             for i in range(self.n): 
@@ -31,11 +32,16 @@ class LogisticRegression:
             increment = -solve(hessian, gradient)
             self.weight += increment
 
-            likelihood = self.compute_likelihood()
+            likelihood = self.compute_likelihood(self.weight)
             print(likelihood)
     
     def train(self):
-        self.weight = newton(self.compute_gradient, self.weight)
+        objective = lambda x : - self.compute_likelihood(x)
+        jac = lambda x : - self.compute_gradient(x)
+        hess= lambda x : - self.compute_hessian(x)
+        self.result = minimize(objective, self.weight, method='Newton-CG', jac=jac, hess=hess)
+        self.weight = self.result.x
+        print(self.weight)
 
 
     def classify(self, sample):

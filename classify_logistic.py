@@ -13,14 +13,15 @@ data = np.loadtxt(TRAIN_DATA_PATH, dtype=str,
                   delimiter=',', skiprows=1, usecols=1)
 
 embeddings = np.loadtxt(TRAIN_EMBEDDING_PATH)
-train_embeddings, test_embeddings = embeddings[:n_train], embeddings[n_train:n_train+n_test]
+training_embeddings, test_embeddings = embeddings[:n_train], embeddings[n_train:n_train+n_test]
     
 labels = pd.read_csv(TRAIN_LABEL_PATH, index_col=0).to_numpy().squeeze()
-train_labels, test_labels = labels[:n_train], labels[n_train:n_train+n_test]
+training_labels, test_labels = labels[:n_train], labels[n_train:n_train+n_test]
 
 
 regularization_tradeoff = 0.1
-classifier = LogisticRegression(train_embeddings, train_labels, regularization_tradeoff)
+
+classifier = LogisticRegression(training_embeddings, training_labels, regularization_tradeoff)
 classifier.train()
 
 predictions = classifier.predict(test_embeddings)

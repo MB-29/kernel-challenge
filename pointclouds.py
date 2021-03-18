@@ -7,7 +7,7 @@ from models.logistic_regression import LogisticRegression
 n, d = 500, 2
 n_train, n_test = n//2, n//2
 X1 = np.random.multivariate_normal(
-    mean=[-1, 1], cov=[[1, 0], [0, 1]], size=n//2)
+    mean=[-1, 2], cov=[[1, 0], [0, 1]], size=n//2)
 X2 = np.random.multivariate_normal(
     mean=[1, -1], cov=[[1, 0], [0, 1]], size=n//2)
 data = np.concatenate([X1, X2])
