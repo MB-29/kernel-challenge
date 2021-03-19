@@ -14,7 +14,7 @@ data = np.concatenate([X1, X2])
 indices = np.random.permutation(n)
 train_indices, test_indices = indices[:n_train], indices[n_train:n_train+n_test]
 train_data, test_data = data[train_indices],  data[test_indices]
-labels = np.concatenate([np.zeros(n//2), np.ones(n//2)])
+labels = np.concatenate([np.ones(n//2), np.ones(n//2)])
 train_labels, test_labels = labels[train_indices], labels[test_indices]
 
 

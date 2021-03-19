@@ -20,17 +20,17 @@ training_data, test_data = data[:n_training], data[n_training:n_training+n_test]
 training_labels, test_labels = labels[:n_training], labels[n_training:n_training+n_test]
 
 
-k = 10
+k = 3
+m = 1
 lambd = 0.5
 index = 1
 K_train = np.zeros((n_training, n_training))
 for i in range(n_training):
     for j in range(i+1):
         source, target = training_data[i], training_data[j]
-        K_train[i, j] = substring_kernel(source, target, lambd, k)
-        # K_train[i, j] = spectrum_kernel(source, target, k)
+        # K_train[i, j] = substring_kernel(source, target, lambd, k)
+        K_train[i, j] = spectrum_kernel(source, target, k)
         K_train[j, i] = K_train[i, j]
-        print(index)
         index += 1
 
 print('kernel')
@@ -42,8 +42,8 @@ K_test = np.zeros((n_test, n_training))
 for i in range(n_test):
     for j in range(n_training):
         source, target = test_data[i], training_data[j]
-        K_test[i, j] = substring_kernel(source, target, lambd, k)
-        # K_test[i, j] = spectrum_kernel(source, target, k)
+        # K_test[i, j] = substring_kernel(source, target, lambd, k)
+        K_test[i, j] = spectrum_kernel(source, target, k)
 
 print('predict')
 test_predictions = classifier.predict(K_test)
