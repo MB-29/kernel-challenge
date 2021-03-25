@@ -4,7 +4,7 @@ import cvxpy
 class KernelSVM:
 
     def __init__(self, train_data, training_labels, regularization, training_gram=None):
-        self.n, self.d = train_data.shape
+        self.n = len(train_data)
         self.train_data = train_data
         self.training_labels = 2*np.array(training_labels)-1
         self.regularization = regularization
@@ -17,7 +17,6 @@ class KernelSVM:
     
     def train(self):
         alpha = cvxpy.Variable(self.n)
-        print(alpha.size)
         objective = cvxpy.Minimize(
             cvxpy.quad_form(alpha, self.gram) - 2*self.training_labels@alpha
             )
@@ -32,8 +31,7 @@ class KernelSVM:
 
     def classify(self, K_test_training):
         decision_values = K_test_training @ self.alpha
-        print(decision_values)
-        return np.sign(decision_values)
+        return (np.sign(decision_values) + 1)//2
         
     
 
