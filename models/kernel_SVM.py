@@ -1,29 +1,9 @@
 import numpy as np
 
-from collections import Counter
 from scipy.spatial.distance import pdist, squareform
-from .Mismatch_nb import MismatchKernelForBioSeq
 from cvxopt import matrix, solvers
 
-def spectrum_kernel(x, y, k):
-    x_substrings = [x[index:index+k] for index in range(len(x)-k+1)]
-    y_substrings = [y[index:index+k] for index in range(len(y)-k+1)]
-    x_counts = Counter(x_substrings)
-    y_counts = Counter(y_substrings)
-    substrings = set(x_counts.keys()).intersection(set(y_counts.keys()))
-    K = 0
-    for string in substrings:
-        K += x_counts[string] * y_counts[string]
-    return K
-
-def fill_spectrum_kernel(X, Y, k):
-    assert X.shape == Y.shape
-    n = X.shape[0]
-    K = np.zeros((n, n))
-    for i in range(n):
-        for j in range(i):
-            K[i, j] = spectrum_kernel(X[i], Y[j], k)
-    return K
+from models.mismatch import MismatchKernelForBioSeq
 
 
 class KSVM:
@@ -42,16 +22,12 @@ class KSVM:
         raise NotImplementedError('Please implement kernel method')
     
     def fit(self):
-        print(self.gram)
         P = matrix(self.gram, tc='d')
-        print(-self.train_labels)
         q = matrix(-self.train_labels, tc='d')
         G_array = np.diag(self.train_labels)
         G_array = np.concatenate((G_array, np.diag(-self.train_labels)), axis=0)
-        print(G_array)
         G = matrix(G_array, tc='d')
         h_array = np.array([1/(2*self.regularization*self.n_train)]*self.n_train + [0]*self.n_train)
-        print(h_array)
         h = matrix(h_array, tc='d')
         sol = solvers.qp(P, q, G, h)
         self.alpha = np.squeeze(np.array(sol['x']), axis=1)
