@@ -37,6 +37,8 @@ def run_prediction(DATA_PATH):
 
         k = k_list[i]
         lambd = 1.0
+
+        # training kernel matrix
         K_train = np.zeros((n_training, n_training))
         for i in range(n_training):
             for j in range(i+1):
@@ -50,6 +52,7 @@ def run_prediction(DATA_PATH):
         print('fiting')
         classifier.fit()
 
+        # # test kernel matrix
         K_test = np.zeros((n_test, n_training))
         for i in range(n_test):
             for j in range(n_training):
